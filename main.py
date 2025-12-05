@@ -2,6 +2,7 @@ import time
 import logging
 
 from logger_config import setup_logging
+from history import save_trip_to_history
 
 
 def calculate_fare(seconds_stopped, seconds_moving):
@@ -84,6 +85,7 @@ def taximeter():
                 moving_time,
                 total_fare
                 )
+            save_trip_to_history(stopped_time, moving_time, total_fare)
 
             trip_activate = False
             state = None
