@@ -1,4 +1,8 @@
 import time
+import logging
+
+from logger_config import setup_logging
+
 
 def calculate_fare(seconds_stopped, seconds_moving):
     """
@@ -36,6 +40,7 @@ def taximeter():
             state = "stopped"
             state_start_time = time.time()
             print("Trip started.Initial state: 'stopped' ")
+            logging.info("Trip started. Initial state: stopped")
         
         elif command in ("stop", "move"):
             if not trip_activate: 
@@ -50,6 +55,11 @@ def taximeter():
             state = "stopped" if command == "stop" else "moving"
             state_start_time = time.time()
             print(f"State changed to '{state}'. ")
+            logging.info(
+                "State changed to %s | duration=%.1fs",
+                state,
+                duration
+            )
         
         elif command == "finish":
             if not trip_activate:
@@ -68,16 +78,26 @@ def taximeter():
             print(f"Total fare: €{total_fare:.2f}")
             print("---------------------\n")
 
+            logging.info(
+                "Trip finished | stopped=%1fs moving=%.1fs total=%.2f€",
+                stopped_time,
+                moving_time,
+                total_fare
+                )
+
             trip_activate = False
             state = None
 
         elif command == "exit":
             print("Exiting the program, Goodbye")
+            logging.info("Program exited by user")
             break
         else:
             print("Unknown command. Use: start, stop, move, finish, or exit")
+            logging.warning("Unknown command entered: %s", command)
 
 if __name__ == "__main__":
+    setup_logging()
     taximeter()
         
 
