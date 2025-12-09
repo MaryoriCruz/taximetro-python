@@ -1,6 +1,6 @@
 from datetime import datetime
 
-def save_trip_to_history(seconds_stopped, seconds_moving, total_fare):
+def save_trip_to_history(seconds_stopped, seconds_moving, total_fare, filename):
     """
     Guarda un registro del trayecto en un archivo de texto.
     Cada línea representa un viaje.
@@ -14,5 +14,5 @@ def save_trip_to_history(seconds_stopped, seconds_moving, total_fare):
         f"fare={total_fare:.2f}€\n"
     )
 
-    with open("trip_history.txt", "a", encoding="utf-8") as file:
+    with open(filename, "a", encoding="utf-8") as file:
         file.write(line)
