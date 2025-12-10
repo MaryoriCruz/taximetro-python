@@ -1,12 +1,24 @@
 import time
+import logging
+
+from logger_config import setup_logging
+from history import save_trip_to_history
+from config import load_config
+
+config = load_config()
+config = load_config()
+STOPPED_PRICE_PER_SECOND = config["stopped_price_per_second"]
+MOVING_PRICE_PER_SECOND = config["moving_price_per_second"]
 
 def calculate_fare(seconds_stopped, seconds_moving):
     """
     Funcion para calcular la tarifa total en euros
-    stopped: 0.02 €/s
-    Moving: 0.05 €/s
+    Usa los precios configurados en STOPPED_PRICE_PER_SECOND y MOVING_PRICE_PER_SECOND.
     """
-    fare = seconds_stopped * 0.02 + seconds_moving * 0.05
+    fare = (
+        seconds_stopped * STOPPED_PRICE_PER_SECOND
+        + seconds_moving * MOVING_PRICE_PER_SECOND
+    )
     print(f"Este es el total:{fare}")
     return fare
 
@@ -36,6 +48,7 @@ def taximeter():
             state = "stopped"
             state_start_time = time.time()
             print("Trip started.Initial state: 'stopped' ")
+            logging.info("Trip started. Initial state: stopped")
         
         elif command in ("stop", "move"):
             if not trip_activate: 
@@ -50,6 +63,11 @@ def taximeter():
             state = "stopped" if command == "stop" else "moving"
             state_start_time = time.time()
             print(f"State changed to '{state}'. ")
+            logging.info(
+                "State changed to %s | duration=%.1fs",
+                state,
+                duration
+            )
         
         elif command == "finish":
             if not trip_activate:
@@ -68,16 +86,27 @@ def taximeter():
             print(f"Total fare: €{total_fare:.2f}")
             print("---------------------\n")
 
+            logging.info(
+                "Trip finished | stopped=%1fs moving=%.1fs total=%.2f€",
+                stopped_time,
+                moving_time,
+                total_fare
+                )
+            save_trip_to_history(stopped_time, moving_time, total_fare)
+
             trip_activate = False
             state = None
 
         elif command == "exit":
             print("Exiting the program, Goodbye")
+            logging.info("Program exited by user")
             break
         else:
             print("Unknown command. Use: start, stop, move, finish, or exit")
+            logging.warning("Unknown command entered: %s", command)
 
 if __name__ == "__main__":
+    setup_logging()
     taximeter()
         
 

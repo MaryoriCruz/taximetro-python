@@ -2,3 +2,4 @@ venv/
 *.log
 trip_history.txt
 __pycache__/
+*.pyc
