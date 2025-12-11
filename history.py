@@ -1,6 +1,11 @@
 from datetime import datetime
 
-def save_trip_to_history(seconds_stopped, seconds_moving, total_fare, filename):
+def save_trip_to_history(
+    seconds_stopped,
+    seconds_moving,
+    total_fare,
+    filename="trip_history.txt",   # 👈 valor por defecto
+):
     """
     Guarda un registro del trayecto en un archivo de texto.
     Cada línea representa un viaje.
