@@ -5,6 +5,10 @@ from logger_config import setup_logging
 from history import save_trip_to_history
 from config import load_config   # 👉 IMPORTANTE
 
+config = load_config()
+config = load_config()
+STOPPED_PRICE_PER_SECOND = config["stopped_price_per_second"]
+MOVING_PRICE_PER_SECOND = config["moving_price_per_second"]
 
 # ============================================
 # CARGAR PRECIOS DESDE CONFIG.JSON
