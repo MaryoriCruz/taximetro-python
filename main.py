@@ -3,15 +3,22 @@ import logging
 
 from logger_config import setup_logging
 from history import save_trip_to_history
+from config import load_config
 
+config = load_config()
+config = load_config()
+STOPPED_PRICE_PER_SECOND = config["stopped_price_per_second"]
+MOVING_PRICE_PER_SECOND = config["moving_price_per_second"]
 
 def calculate_fare(seconds_stopped, seconds_moving):
     """
     Funcion para calcular la tarifa total en euros
-    stopped: 0.02 €/s
-    Moving: 0.05 €/s
+    Usa los precios configurados en STOPPED_PRICE_PER_SECOND y MOVING_PRICE_PER_SECOND.
     """
-    fare = seconds_stopped * 0.02 + seconds_moving * 0.05
+    fare = (
+        seconds_stopped * STOPPED_PRICE_PER_SECOND
+        + seconds_moving * MOVING_PRICE_PER_SECOND
+    )
     print(f"Este es el total:{fare}")
     return fare
 
