@@ -1,5 +1,6 @@
 import time
 import logging
+import random
 
 
 from logger_config import setup_logging
@@ -47,8 +48,13 @@ def print_help():
     print(f"  {MAGENTA}xmas{RESET}    -> Toggle Christmas mode (discount + lights)")
     print(f"  {CYAN}help{RESET}    -> Show this help message")
     print(f"  {RED}exit{RESET}    -> Exit the program\n")
+    print(f"  {MAGENTA}led{RESET}     -> Show LED garland animation")
+    print(f"  {MAGENTA}jingle{RESET}  -> Play a tiny Christmas jingle (beeps)")
 
-
+def print_separator():
+    """Imprime una línea separadora navideña."""
+    print(f"{MAGENTA}" + "-" * 35 + RESET)
+    
 def format_time(seconds: float) -> str:
     """
     Convierte segundos a formato mm:ss.
@@ -77,6 +83,73 @@ def xmas_lights_animation(cycles: int = 3, delay: float = 0.2):
         time.sleep(delay) 
 
     print("\r" + " " * 60 + "\r", end="")
+
+def led_strip_animation(cycles: int = 22, delay: float = 0.08, length: int = 26):
+    """
+    Animación de una guirnalda LED navideña con colores cambiantes.
+    """
+    colors = [RED, GREEN, YELLOW, CYAN, MAGENTA]
+    symbol_on = "●"
+    symbol_off = "○"
+
+    for step in range(cycles):
+        strip = ""
+
+        for pos in range(length):
+            color = colors[(pos + step) % len(colors)]
+
+            if (pos + step) % 2 == 0:
+                strip += f"{color}{symbol_on}{RESET} "
+            else:
+                strip += f"{color}{symbol_off}{RESET} "
+
+        print(f"\r{strip}", end="", flush=True)
+        time.sleep(delay)
+
+    # Limpia la línea al final
+    print("\r" + " " * (length * 2) + "\r", end="")
+
+
+def play_xmas_jingle():
+    """
+    Hace una mini-melodia con beeps.
+    Nota: en algunas terminales el sonido puede estar desactivado.
+    """
+    try:
+        import winsound  # Solo Windows
+        notes = [
+            (659, 150), (659, 150), (659, 250),   # ♪ ♪ ♪
+            (659, 150), (659, 150), (659, 250),   # ♪ ♪ ♪
+            (659, 150), (784, 150), (523, 150), (587, 150), (659, 400)  # remate
+        ]
+        for freq, dur in notes:
+            winsound.Beep(freq, dur)
+            time.sleep(0.02)
+    except Exception:
+        # Fallback universal: campanita de consola
+        for _ in range(10):
+            print("\a", end="", flush=True)
+            time.sleep(0.12)
+
+def get_random_xmas_message(xmas_mode: bool = False) -> str:
+    """
+    Devuelve un mensaje navideño aleatorio para mostrar al finalizar el viaje.
+    Si xmas_mode es True, prioriza mensajes con temática navideña.
+    """
+    generic = [
+    "🚕 Gracias por viajar con nosotros.",
+    "🌟 Esperamos que tu día vaya genial.",
+    "👍 ¡Viaje finalizado con éxito!",
+    "😄 ¡Vuelve pronto!",
+]
+    xmas_only = [
+    "🎄 ¡Feliz Navidad! Gracias por viajar con nosotros.",
+    "🎅 Que tus viajes sean tan suaves como la nieve.",
+    "✨ ¡Ho ho ho! Descuento navideño aplicado.",
+    "🧦 Ojalá tu día esté lleno de magia navideña.",
+    ]
+    pool = xmas_only + generic if xmas_mode else generic + xmas_only
+    return random.choice(pool)
 # ============================================
 # CALCULAR TARIFA
 # ============================================
@@ -216,7 +289,12 @@ def taximeter():
                 )
 
                 save_trip_to_history(stopped_time, moving_time, final_fare)
-
+                #-------aquí estan nuetsros mensajes aleatorios---------
+                msg = get_random_xmas_message(xmas_mode)
+                print_separator()
+                print(f"{MAGENTA}{BOLD}{msg}{RESET}")
+                print_separator()
+                logging.info("Showed random xmas message: %s", msg)
                 trip_activate = False
                 state = None
                 print(f"{GREEN}✅ Trip finished. You can start a new one with 'start'.{RESET}")
@@ -229,12 +307,24 @@ def taximeter():
 
                 if xmas_mode:
                     print(f"{GREEN}🎄 Christmas mode ACTIVATED! 20% discount applied to fares.{RESET}")
-                    xmas_lights_animation()
+                    led_strip_animation()
+                    play_xmas_jingle()
                     logging.info("Christmas mode activated")
                 else:
                     print(f"{YELLOW}🎄 Christmas mode DEACTIVATED. Normal fares restored.{RESET}")
                     logging.info("Christmas mode deactivated")
-
+            
+            # =======================
+            # LUCES LED
+            # =======================
+            elif command =="led":
+                led_strip_animation()
+            
+            # =======================
+            # SONIDO NAVIDEÑO
+            # =======================
+            elif command == "jingle":
+                play_xmas_jingle()
 
             # =======================
             # HELP
