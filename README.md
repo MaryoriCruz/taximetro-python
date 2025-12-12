@@ -120,4 +120,3 @@ Añadir más animaciones navideñas 🎅
 Expandir modos de viaje y descuentos
 
 Mejorar la UX en CLI
-
